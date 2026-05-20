@@ -75,7 +75,7 @@
         .results-list li .time { font-size: 12px; color: var(--primary); font-weight: 500; display: inline-block; padding: 4px 8px; background: rgba(37,99,235,0.1); border-radius: 4px; }
 
         /* 지도 영역 */
-        #map { flex: 1; height: 100%; position: relative; }
+        #map { flex: 1; height: 100%; position: relative; background-color: #e5e7eb; }
 
         /* 커스텀 이모지 마커 스타일 */
         .emoji-marker {
@@ -133,7 +133,7 @@
 
         <ul id="resultsList" class="results-list">
             <li style="text-align:center; border:none; box-shadow:none; background:transparent; margin-top:20px; color:var(--text-muted);">
-                위치 권한을 허용하거나 장소를 검색해주세요.
+                데이터를 불러오는 중입니다...
             </li>
         </ul>
     </aside>
@@ -144,7 +144,7 @@
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d590ac57a992632760c2bc0b3177cfef&libraries=services"></script>
 
 <script>
-    // 카테고리 기반 설정
+    // 카테고리 설정 객체
     const CATEGORY_SETTINGS = {
         PCBANG: { keyword: "PC방", groupCode: "AG2", emoji: "🎮" },
         KARAOKE: { keyword: "노래방", groupCode: "AG2", emoji: "🎤" }
@@ -154,36 +154,40 @@
     let placeMarkers = [];    
     let currentCategory = 'PCBANG';
     let userCenterLocation = null;
-    let customPopupOverlay = null; // 커스텀 팝업창 관리
-    let isInitialLoad = true;      // 무분별한 오류창 방지용 플래그
+    let customPopupOverlay = null; 
+    let isInitialLoad = true;      
 
-    kakao.maps.load(function() {
-        const mapContainer = document.getElementById('map'); 
-        const mapOption = {
-            center: new kakao.maps.LatLng(37.566826, 126.9786567),
-            level: 4
-        };
+    // 지도를 무조건 먼저 생성 (에러 방지 핵심)
+    const mapContainer = document.getElementById('map'); 
+    const mapOption = {
+        center: new kakao.maps.LatLng(37.566826, 126.9786567), // 기본 서울시청 위치
+        level: 4
+    };
+    
+    // 비동기 권한 대기 없이 지도를 즉시 화면에 렌더링합니다.
+    map = new kakao.maps.Map(mapContainer, mapOption);
+    ps = new kakao.maps.services.Places();
 
-        map = new kakao.maps.Map(mapContainer, mapOption);
-        ps = new kakao.maps.services.Places();
-        
-        getCurrentLocation();
-    });
+    // 지도가 생성된 직후 내 위치 추적 및 검색 가동
+    initService();
 
-    // 1. 현재 위치 가져오기
-    function getCurrentLocation() {
+    function initService() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 userCenterLocation = new kakao.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                
+                // 내 위치로 지도 부드럽게 중심 이동
                 map.setCenter(userCenterLocation);
                 
-                // 내 위치 파란점 생성
+                // 내 위치 파란점 표시
                 const markerContent = document.createElement('div');
                 markerContent.className = 'current-location-marker';
                 new kakao.maps.CustomOverlay({ position: userCenterLocation, content: markerContent, map: map });
 
+                // 주변 검색 실행
                 searchPlacesByCategory(currentCategory);
             }, function(error) {
+                console.warn("위치 권한 제한됨. 기본 좌표에서 검색을 실행합니다.");
                 userCenterLocation = map.getCenter();
                 searchPlacesByCategory(currentCategory);
             });
@@ -193,11 +197,158 @@
         }
     }
 
-    // 2. 탭 전환
+    // 카테고리 주변 검색
+    function searchPlacesByCategory(categoryKey) {
+        const settings = CATEGORY_SETTINGS[categoryKey];
+        const searchCenter = userCenterLocation || map.getCenter();
+
+        ps.keywordSearch(settings.keyword, placesSearchCallback, {
+            category_group_code: settings.groupCode,
+            location: searchCenter,
+            radius: 2000
+        });
+    }
+
+    // 탭 전환
     function switchCategory(categoryKey) {
         if (currentCategory === categoryKey) return;
         currentCategory = categoryKey;
-        isInitialLoad = true; // 탭 변경 시에도 자동 검색 경고창 방지
+        isInitialLoad = true; 
 
         document.getElementById('tabPcbang').classList.toggle('active', categoryKey === 'PCBANG');
-        document.getElementById
+        document.getElementById('tabKaraoke').classList.toggle('active', categoryKey === 'KARAOKE');
+        document.getElementById('keywordInput').value = '';
+        
+        closePopup();
+        removePlaceMarkers();
+        searchPlacesByCategory(categoryKey);
+    }
+
+    // 수동 키워드 검색
+    function searchPlacesByKeyword() {
+        const keyword = document.getElementById('keywordInput').value;
+        if (!keyword.trim()) {
+            alert('검색어를 입력해 주세요!');
+            return;
+        }
+
+        isInitialLoad = false; 
+        closePopup();
+        removePlaceMarkers();
+        ps.keywordSearch(keyword, placesSearchCallback);
+    }
+
+    // 검색 결과 콜백
+    function placesSearchCallback(data, status) {
+        if (status === kakao.maps.services.Status.OK) {
+            displayResults(data);
+            isInitialLoad = false; 
+        } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+            document.getElementById('resultsList').innerHTML = `<li style="text-align:center; border:none; box-shadow:none; background:transparent; color:var(--text-muted); margin-top:20px;">검색 결과가 없습니다.</li>`;
+            removePlaceMarkers();
+            if (!isInitialLoad) alert('검색 결과가 없습니다. 다른 위치나 키워드로 시도해보세요.');
+        } else {
+            if (!isInitialLoad) alert('데이터를 가져오는 중 오류가 발생했습니다.');
+        }
+    }
+
+    // 리스트 및 마커 표시
+    function displayResults(places) {
+        const listEl = document.getElementById('resultsList');
+        const bounds = new kakao.maps.LatLngBounds();
+        const settings = CATEGORY_SETTINGS[currentCategory];
+        
+        listEl.innerHTML = '';
+        removePlaceMarkers();
+
+        places.forEach(place => {
+            const placePosition = new kakao.maps.LatLng(place.y, place.x);
+            createCustomMarker(placePosition, settings.emoji, place);
+            const itemEl = createListItem(place);
+
+            bounds.extend(placePosition);
+
+            // 리스트 클릭 이벤트 (해당 위치 이동 + 팝업 창 오픈)
+            itemEl.onclick = function() {
+                map.panTo(placePosition);
+                openCustomPopup(placePosition, place);
+            };
+
+            listEl.appendChild(itemEl);
+        });
+
+        map.setBounds(bounds);
+    }
+
+    // 커스텀 이모지 마커 생성
+    function createCustomMarker(position, emoji, placeData) {
+        const markerContent = document.createElement('div');
+        markerContent.className = 'emoji-marker';
+        markerContent.innerText = emoji;
+
+        const customOverlay = new kakao.maps.CustomOverlay({
+            position: position,
+            content: markerContent,
+            map: map,
+            yAnchor: 0.5 
+        });
+
+        placeMarkers.push(customOverlay);
+
+        // 이모지 마커 클릭 시 정보 팝업창 오픈
+        markerContent.onclick = function() {
+            openCustomPopup(position, placeData);
+        };
+
+        return customOverlay;
+    }
+
+    // 커스텀 팝업 열기
+    function openCustomPopup(position, place) {
+        closePopup(); 
+
+        const content = document.createElement('div');
+        content.className = 'custom-popup';
+        content.innerHTML = `
+            <div class="close-btn" onclick="closePopup()">✕</div>
+            <div class="title">${place.place_name}</div>
+            <div class="address">${place.road_address_name || place.address_name}</div>
+            <a href="${place.place_url}" target="_blank" class="link-btn">카카오맵 상세보기 ↗</a>
+        `;
+
+        customPopupOverlay = new kakao.maps.CustomOverlay({
+            position: position,
+            content: content,
+            map: map,
+            zIndex: 100
+        });
+    }
+
+    // 팝업 닫기 함수 등록
+    window.closePopup = function() {
+        if (customPopupOverlay) {
+            customPopupOverlay.setMap(null);
+            customPopupOverlay = null;
+        }
+    }
+
+    // 기존 마커 청소
+    function removePlaceMarkers() {
+        placeMarkers.forEach(marker => marker.setMap(null));
+        placeMarkers = [];
+    }
+
+    // 리스트 아이템 엘리먼트 생성
+    function createListItem(place) {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <strong>${place.place_name}</strong>
+            <span class="address">${place.road_address_name || place.address_name}</span>
+            <span class="time">상세 정보 확인하기</span>
+        `;
+        return li;
+    }
+</script>
+
+</body>
+</html>
