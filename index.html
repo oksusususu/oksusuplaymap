@@ -3,352 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>데일리일탈 - 내 주변 놀거리 찾기</title>
+    <title>청소년을 위한 💙 일탈 가이드 🌽</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     
     <style>
         /* =========================================
-           현대적인 블루톤 UI/CSS 디자인
+           현대적이고 미학적인 블루톤 브랜딩 CSS 디자인
         ========================================= */
         :root {
-            --primary: #2563eb;       /* 메인 블루 */
-            --primary-hover: #1d4ed8; /* 호버 블루 */
-            --bg-light: #f8fafc;      /* 배경색 */
-            --text-dark: #0f172a;     /* 진한 글씨 */
-            --text-muted: #64748b;    /* 연한 글씨 */
-            --border-color: #e2e8f0;  /* 테두리 색 */
+            --primary: #2563eb;       /* 메인 브랜드 블루 */
+            --primary-light: #eff6ff; /* 매우 연한 배경 블루 */
+            --primary-hover: #1d4ed8; /* 호버 시 블루 */
+            
+            --bg-white: #ffffff;
+            --bg-light: #f8fafc;
+            
+            --text-dark: #0f172a;     /* 메인 텍스트 */
+            --text-title: #1e40af;    /* 브랜드 타이틀 블루 */
+            --text-muted: #64748b;    /* muted 텍스트 */
+            
+            --border-color: #e2e8f0;  /* 경계선 */
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.03);
+            --shadow-md: 0 4px 12px rgba(37,99,235,0.08);
+            --shadow-popup: 0 10px 30px rgba(0,0,0,0.12);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body, html { width: 100%; height: 100%; font-family: 'Pretendard', sans-serif; background-color: var(--bg-light); color: var(--text-dark); }
+        body, html { width: 100%; height: 100%; font-family: 'Pretendard', sans-serif; background-color: var(--bg-light); color: var(--text-dark); -webkit-font-smoothing: antialiased; }
 
         .main-container { display: flex; width: 100%; height: 100vh; overflow: hidden; }
 
-        /* 왼쪽 사이드바 디자인 */
+        /* =========================================
+           왼쪽 사이드바 - 브랜딩 강화 디자인
+        ========================================= */
         .sidebar {
             width: 380px;
             height: 100%;
             display: flex;
             flex-direction: column;
-            background: #ffffff;
-            box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+            background: var(--bg-white);
+            box-shadow: 5px 0 20px rgba(0,0,0,0.04);
             z-index: 10;
+            border-right: 1px solid var(--border-color);
         }
 
-        /* 탭 메뉴 디자인 */
-        .tab-container { display: flex; padding: 15px 20px 0; gap: 10px; border-bottom: 1px solid var(--border-color); }
-        .tab-button {
-            flex: 1; padding: 12px 0; border: none; background: transparent;
-            font-size: 15px; font-weight: 600; color: var(--text-muted);
-            cursor: pointer; transition: all 0.2s; position: relative;
-        }
-        .tab-button.active { color: var(--primary); }
-        .tab-button.active::after {
-            content: ''; position: absolute; bottom: -1px; left: 0; width: 100%;
-            height: 3px; background-color: var(--primary); border-radius: 3px 3px 0 0;
+        /* 👑 미학적 사이드바 헤더 (브랜드 타이틀 영역) */
+        .sidebar-header {
+            padding: 30px 25px 15px; /* 세로폭을 넓혀 여유를 줌 */
+            background: linear-gradient(180deg, var(--primary-light) 0%, rgba(255,255,255,1) 100%);
+            border-bottom: 1px solid var(--border-color);
         }
 
-        /* 검색 영역 디자인 */
-        .search-area { padding: 20px; border-bottom: 1px solid var(--border-color); }
-        .search-box { display: flex; gap: 8px; }
-        .search-area input {
-            flex: 1; padding: 12px 16px; border: 1px solid var(--border-color);
-            border-radius: 8px; font-size: 14px; outline: none; transition: border 0.2s;
-        }
-        .search-area input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        .search-area button {
-            padding: 0 20px; background-color: var(--primary); color: white; border: none;
-            border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s;
-        }
-        .search-area button:hover { background-color: var(--primary-hover); }
-
-        /* 결과 리스트 디자인 */
-        .results-list { flex: 1; overflow-y: auto; list-style: none; padding: 15px 20px; }
-        .results-list li {
-            padding: 16px; margin-bottom: 12px; border-radius: 12px;
-            border: 1px solid var(--border-color); background: #fff;
-            cursor: pointer; transition: all 0.2s ease;
-        }
-        .results-list li:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37,99,235,0.08); }
-        .results-list li strong { display: block; font-size: 16px; margin-bottom: 6px; color: var(--text-dark); }
-        .results-list li .address { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; display: block; }
-        .results-list li .time { font-size: 12px; color: var(--primary); font-weight: 500; display: inline-block; padding: 4px 8px; background: rgba(37,99,235,0.1); border-radius: 4px; }
-
-        /* 지도 영역 */
-        #map { flex: 1; height: 100%; position: relative; background-color: #e5e7eb; }
-
-        /* 커스텀 이모지 마커 스타일 */
-        .emoji-marker {
-            display: flex; justify-content: center; align-items: center;
-            width: 44px; height: 44px; background: #fff; border-radius: 50%;
-            font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            border: 2px solid var(--primary); cursor: pointer; transition: transform 0.2s;
-        }
-        .emoji-marker:hover { transform: scale(1.1); z-index: 5; }
-
-        /* 내 위치 파란 점 애니메이션 */
-        .current-location-marker {
-            width: 18px; height: 18px; background: var(--primary);
-            border: 3px solid #fff; border-radius: 50%; box-shadow: 0 0 10px rgba(37,99,235,0.6);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(37,99,235,0.7); }
-            70% { box-shadow: 0 0 0 12px rgba(37,99,235,0); }
-            100% { box-shadow: 0 0 0 0 rgba(37,99,235,0); }
+        .site-title {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
 
-        /* 아름다운 커스텀 팝업 디자인 */
-        .custom-popup {
-            background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-            padding: 16px; width: 220px; position: relative; bottom: 20px;
-            border: 1px solid var(--border-color); transform: translate(-50%, -100%);
-        }
-        .custom-popup::after {
-            content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%) rotate(45deg);
-            width: 12px; height: 12px; background: #fff; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
-        }
-        .custom-popup .title { font-size: 15px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 20px;}
-        .custom-popup .address { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4; }
-        .custom-popup .link-btn { display: block; text-align: center; background: var(--primary); color: #fff; text-decoration: none; font-size: 12px; font-weight: 600; padding: 8px 0; border-radius: 6px; transition: background 0.2s;}
-        .custom-popup .link-btn:hover { background: var(--primary-hover); }
-        .custom-popup .close-btn { position: absolute; top: 12px; right: 12px; cursor: pointer; color: var(--text-muted); font-size: 14px; font-weight: bold;}
-    </style>
-</head>
-<body>
-
-<div class="main-container">
-    <aside class="sidebar">
-        <div class="tab-container">
-            <button id="tabPcbang" class="tab-button active" onclick="switchCategory('PCBANG')">🎮 PC방</button>
-            <button id="tabKaraoke" class="tab-button" onclick="switchCategory('KARAOKE')">🎤 노래방</button>
-        </div>
-
-        <div class="search-area">
-            <div class="search-box">
-                <input type="text" id="keywordInput" placeholder="동네 이름 검색 (예: 홍대)" onkeyup="if(event.key==='Enter') searchPlacesByKeyword()">
-                <button onclick="searchPlacesByKeyword()">검색</button>
-            </div>
-        </div>
-
-        <ul id="resultsList" class="results-list">
-            <li style="text-align:center; border:none; box-shadow:none; background:transparent; margin-top:20px; color:var(--text-muted);">
-                데이터를 불러오는 중입니다...
-            </li>
-        </ul>
-    </aside>
-
-    <div id="map"></div>
-</div>
-
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d590ac57a992632760c2bc0b3177cfef&libraries=services"></script>
-
-<script>
-    // 카테고리 설정 객체
-    const CATEGORY_SETTINGS = {
-        PCBANG: { keyword: "PC방", groupCode: "AG2", emoji: "🎮" },
-        KARAOKE: { keyword: "노래방", groupCode: "AG2", emoji: "🎤" }
-    };
-
-    let map, ps;
-    let placeMarkers = [];    
-    let currentCategory = 'PCBANG';
-    let userCenterLocation = null;
-    let customPopupOverlay = null; 
-    let isInitialLoad = true;      
-
-    // 지도를 무조건 먼저 생성 (에러 방지 핵심)
-    const mapContainer = document.getElementById('map'); 
-    const mapOption = {
-        center: new kakao.maps.LatLng(37.566826, 126.9786567), // 기본 서울시청 위치
-        level: 4
-    };
-    
-    // 비동기 권한 대기 없이 지도를 즉시 화면에 렌더링합니다.
-    map = new kakao.maps.Map(mapContainer, mapOption);
-    ps = new kakao.maps.services.Places();
-
-    // 지도가 생성된 직후 내 위치 추적 및 검색 가동
-    initService();
-
-    function initService() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                userCenterLocation = new kakao.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                
-                // 내 위치로 지도 부드럽게 중심 이동
-                map.setCenter(userCenterLocation);
-                
-                // 내 위치 파란점 표시
-                const markerContent = document.createElement('div');
-                markerContent.className = 'current-location-marker';
-                new kakao.maps.CustomOverlay({ position: userCenterLocation, content: markerContent, map: map });
-
-                // 주변 검색 실행
-                searchPlacesByCategory(currentCategory);
-            }, function(error) {
-                console.warn("위치 권한 제한됨. 기본 좌표에서 검색을 실행합니다.");
-                userCenterLocation = map.getCenter();
-                searchPlacesByCategory(currentCategory);
-            });
-        } else {
-            userCenterLocation = map.getCenter();
-            searchPlacesByCategory(currentCategory);
-        }
-    }
-
-    // 카테고리 주변 검색
-    function searchPlacesByCategory(categoryKey) {
-        const settings = CATEGORY_SETTINGS[categoryKey];
-        const searchCenter = userCenterLocation || map.getCenter();
-
-        ps.keywordSearch(settings.keyword, placesSearchCallback, {
-            category_group_code: settings.groupCode,
-            location: searchCenter,
-            radius: 2000
-        });
-    }
-
-    // 탭 전환
-    function switchCategory(categoryKey) {
-        if (currentCategory === categoryKey) return;
-        currentCategory = categoryKey;
-        isInitialLoad = true; 
-
-        document.getElementById('tabPcbang').classList.toggle('active', categoryKey === 'PCBANG');
-        document.getElementById('tabKaraoke').classList.toggle('active', categoryKey === 'KARAOKE');
-        document.getElementById('keywordInput').value = '';
-        
-        closePopup();
-        removePlaceMarkers();
-        searchPlacesByCategory(categoryKey);
-    }
-
-    // 수동 키워드 검색
-    function searchPlacesByKeyword() {
-        const keyword = document.getElementById('keywordInput').value;
-        if (!keyword.trim()) {
-            alert('검색어를 입력해 주세요!');
-            return;
+        .title-sub {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--primary); /* "청소년을 위한" 부분은 브랜드 컬러로 */
+            letter-spacing: 0.5px;
         }
 
-        isInitialLoad = false; 
-        closePopup();
-        removePlaceMarkers();
-        ps.keywordSearch(keyword, placesSearchCallback);
-    }
-
-    // 검색 결과 콜백
-    function placesSearchCallback(data, status) {
-        if (status === kakao.maps.services.Status.OK) {
-            displayResults(data);
-            isInitialLoad = false; 
-        } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
-            document.getElementById('resultsList').innerHTML = `<li style="text-align:center; border:none; box-shadow:none; background:transparent; color:var(--text-muted); margin-top:20px;">검색 결과가 없습니다.</li>`;
-            removePlaceMarkers();
-            if (!isInitialLoad) alert('검색 결과가 없습니다. 다른 위치나 키워드로 시도해보세요.');
-        } else {
-            if (!isInitialLoad) alert('데이터를 가져오는 중 오류가 발생했습니다.');
+        .title-main {
+            font-size: 26px; /* 크기를 키워 강조 */
+            font-weight: 800; /* 아주 두껍게 */
+            color: var(--text-title); /* 진한 블루로 고급스럽게 */
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
-    }
-
-    // 리스트 및 마커 표시
-    function displayResults(places) {
-        const listEl = document.getElementById('resultsList');
-        const bounds = new kakao.maps.LatLngBounds();
-        const settings = CATEGORY_SETTINGS[currentCategory];
-        
-        listEl.innerHTML = '';
-        removePlaceMarkers();
-
-        places.forEach(place => {
-            const placePosition = new kakao.maps.LatLng(place.y, place.x);
-            createCustomMarker(placePosition, settings.emoji, place);
-            const itemEl = createListItem(place);
-
-            bounds.extend(placePosition);
-
-            // 리스트 클릭 이벤트 (해당 위치 이동 + 팝업 창 오픈)
-            itemEl.onclick = function() {
-                map.panTo(placePosition);
-                openCustomPopup(placePosition, place);
-            };
-
-            listEl.appendChild(itemEl);
-        });
-
-        map.setBounds(bounds);
-    }
-
-    // 커스텀 이모지 마커 생성
-    function createCustomMarker(position, emoji, placeData) {
-        const markerContent = document.createElement('div');
-        markerContent.className = 'emoji-marker';
-        markerContent.innerText = emoji;
-
-        const customOverlay = new kakao.maps.CustomOverlay({
-            position: position,
-            content: markerContent,
-            map: map,
-            yAnchor: 0.5 
-        });
-
-        placeMarkers.push(customOverlay);
-
-        // 이모지 마커 클릭 시 정보 팝업창 오픈
-        markerContent.onclick = function() {
-            openCustomPopup(position, placeData);
-        };
-
-        return customOverlay;
-    }
-
-    // 커스텀 팝업 열기
-    function openCustomPopup(position, place) {
-        closePopup(); 
-
-        const content = document.createElement('div');
-        content.className = 'custom-popup';
-        content.innerHTML = `
-            <div class="close-btn" onclick="closePopup()">✕</div>
-            <div class="title">${place.place_name}</div>
-            <div class="address">${place.road_address_name || place.address_name}</div>
-            <a href="${place.place_url}" target="_blank" class="link-btn">카카오맵 상세보기 ↗</a>
-        `;
-
-        customPopupOverlay = new kakao.maps.CustomOverlay({
-            position: position,
-            content: content,
-            map: map,
-            zIndex: 100
-        });
-    }
-
-    // 팝업 닫기 함수 등록
-    window.closePopup = function() {
-        if (customPopupOverlay) {
-            customPopupOverlay.setMap(null);
-            customPopupOverlay = null;
-        }
-    }
-
-    // 기존 마커 청소
-    function removePlaceMarkers() {
-        placeMarkers.forEach(marker => marker.setMap(null));
-        placeMarkers = [];
-    }
-
-    // 리스트 아이템 엘리먼트 생성
-    function createListItem(place) {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <strong>${place.place_name}</strong>
-            <span class="address">${place.road_address_name || place.address_name}</span>
-            <span class="time">상세 정보 확인하기</span>
-        `;
-        return li;
-    }
-</script>
-
-</body>
-</html>
