@@ -8,24 +8,20 @@
     
     <style>
         /* =========================================
-           현대적이고 미학적인 블루톤 브랜딩 CSS 디자인
+           현대적이고 미학적인 블루톤 브랜딩 CSS
         ========================================= */
         :root {
-            --primary: #2563eb;       /* 메인 브랜드 블루 */
-            --primary-light: #eff6ff; /* 매우 연한 배경 블루 */
-            --primary-hover: #1d4ed8; /* 호버 시 블루 */
-            
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --primary-hover: #1d4ed8;
             --bg-white: #ffffff;
             --bg-light: #f8fafc;
-            
-            --text-dark: #0f172a;     /* 메인 텍스트 */
-            --text-title: #1e40af;    /* 브랜드 타이틀 블루 */
-            --text-muted: #64748b;    /* muted 텍스트 */
-            
-            --border-color: #e2e8f0;  /* 경계선 */
+            --text-dark: #0f172a;
+            --text-title: #1e40af;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
             --radius-md: 12px;
             --radius-sm: 8px;
-            
             --shadow-sm: 0 2px 4px rgba(0,0,0,0.03);
             --shadow-md: 0 4px 12px rgba(37,99,235,0.08);
             --shadow-popup: 0 10px 30px rgba(0,0,0,0.12);
@@ -36,46 +32,37 @@
 
         .main-container { display: flex; width: 100%; height: 100vh; overflow: hidden; }
 
-        /* =========================================
-           왼쪽 사이드바 - 브랜딩 강화 디자인
-        ========================================= */
         .sidebar {
-            width: 380px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            background: var(--bg-white);
-            box-shadow: 5px 0 20px rgba(0,0,0,0.04);
-            z-index: 10;
-            border-right: 1px solid var(--border-color);
+            width: 380px; height: 100%; display: flex; flex-direction: column;
+            background: var(--bg-white); box-shadow: 5px 0 20px rgba(0,0,0,0.04);
+            z-index: 10; border-right: 1px solid var(--border-color);
         }
 
-        /* 👑 미학적 사이드바 헤더 (브랜드 타이틀 영역) */
         .sidebar-header {
-            padding: 30px 25px 15px; /* 세로폭을 넓혀 여유를 줌 */
+            padding: 30px 25px 15px;
             background: linear-gradient(180deg, var(--primary-light) 0%, rgba(255,255,255,1) 100%);
             border-bottom: 1px solid var(--border-color);
         }
 
-        .site-title {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
+        .site-title { display: flex; flex-direction: column; gap: 2px; }
+        .title-sub { font-size: 13px; font-weight: 500; color: var(--primary); letter-spacing: 0.5px; }
+        .title-main { font-size: 26px; font-weight: 800; color: var(--text-title); letter-spacing: -0.5px; display: flex; align-items: center; gap: 5px; }
+        .emoji { font-size: 24px; }
+
+        .tab-container { display: flex; padding: 10px 20px 0; gap: 10px; border-bottom: 1px solid var(--border-color); }
+        .tab-button {
+            flex: 1; padding: 15px 0; border: none; background: transparent;
+            font-size: 15px; font-weight: 700; color: var(--text-muted);
+            cursor: pointer; transition: all 0.2s; position: relative;
+        }
+        .tab-button.active { color: var(--primary); }
+        .tab-button.active::after {
+            content: ''; position: absolute; bottom: -1px; left: 0; width: 100%;
+            height: 3px; background-color: var(--primary); border-radius: 3px 3px 0 0;
         }
 
-        .title-sub {
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--primary); /* "청소년을 위한" 부분은 브랜드 컬러로 */
-            letter-spacing: 0.5px;
-        }
-
-        .title-main {
-            font-size: 26px; /* 크기를 키워 강조 */
-            font-weight: 800; /* 아주 두껍게 */
-            color: var(--text-title); /* 진한 블루로 고급스럽게 */
-            letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+        .search-area { padding: 20px 25px; border-bottom: 1px solid var(--border-color); background-color: var(--bg-white); }
+        .search-box { display: flex; gap: 8px; }
+        .search-area input {
+            flex: 1; padding: 13px 18px; border: 1px solid var(--border-color);
+            border-radius: var(--
